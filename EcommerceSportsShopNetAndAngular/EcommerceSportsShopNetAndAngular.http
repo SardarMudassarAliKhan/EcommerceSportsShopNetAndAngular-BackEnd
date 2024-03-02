@@ -1,0 +1,6 @@
+@EcommerceSportsShopNetAndAngular_HostAddress = http://localhost:5235
+
+GET {{EcommerceSportsShopNetAndAngular_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
