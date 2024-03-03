@@ -1,7 +1,7 @@
-﻿using EcommerceSportsShopNetAndAngular.Entities;
+﻿using Core.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace EcommerceSportsShopNetAndAngular.Data
+namespace Infrastracture.Data
 {
     public class AppDbContext : DbContext
     {
@@ -11,6 +11,10 @@ namespace EcommerceSportsShopNetAndAngular.Data
         }
 
         public DbSet<Product> Products { get; set; }
+
+        public DbSet<ProductBrand> ProductBrands { get; set; }
+
+        public DbSet<ProductType> ProductTypes { get; set; }
 
     }
 }

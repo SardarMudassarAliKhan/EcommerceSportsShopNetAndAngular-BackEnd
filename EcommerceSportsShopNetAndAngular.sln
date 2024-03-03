@@ -5,6 +5,10 @@ VisualStudioVersion = 17.9.34607.119
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EcommerceSportsShopNetAndAngular", "EcommerceSportsShopNetAndAngular\EcommerceSportsShopNetAndAngular.csproj", "{44C61049-7D54-4DB0-BA97-82B20C7C4D67}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastracture", "Infrastracture\Infrastracture.csproj", "{D6BE18E7-26C2-402C-A578-CA316E692A12}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core", "Core\Core.csproj", "{3B753526-044E-4BBA-B1FA-0DED905B6567}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{44C61049-7D54-4DB0-BA97-82B20C7C4D67}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{44C61049-7D54-4DB0-BA97-82B20C7C4D67}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{44C61049-7D54-4DB0-BA97-82B20C7C4D67}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D6BE18E7-26C2-402C-A578-CA316E692A12}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D6BE18E7-26C2-402C-A578-CA316E692A12}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D6BE18E7-26C2-402C-A578-CA316E692A12}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D6BE18E7-26C2-402C-A578-CA316E692A12}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B753526-044E-4BBA-B1FA-0DED905B6567}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B753526-044E-4BBA-B1FA-0DED905B6567}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B753526-044E-4BBA-B1FA-0DED905B6567}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B753526-044E-4BBA-B1FA-0DED905B6567}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

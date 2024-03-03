@@ -1,5 +1,8 @@
-﻿using EcommerceSportsShopNetAndAngular.Data;
-using EcommerceSportsShopNetAndAngular.Entities;
+﻿using AutoMapper;
+using Core.Entities;
+using Core.Interfaces;
+using Core.Specifications;
+using EcommerceSportsShopNetAndAngular.Dtos.API.Dtos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,30 +12,41 @@ namespace EcommerceSportsShopNetAndAngular.Controllers
     [ApiController]
     public class ProductsController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        public IGenericRepository<Product> GenericRepositoryProducts;
+        public IGenericRepository<ProductType> GenericRepositoryProductType;
+        public IGenericRepository<ProductBrand> GenericRepositoryProductBrand;
+        private readonly IMapper mapper;
 
-        public ProductsController(AppDbContext context)
+        public ProductsController(
+            IGenericRepository<Product> genericRepositoryProducs,
+            IGenericRepository<ProductType> genericRepositoryProductType,
+            IGenericRepository<ProductBrand> genericRepositoryProductBrand,
+            IMapper mapper)
         {
-            _context = context;
+            GenericRepositoryProducts = genericRepositoryProducs;
+            GenericRepositoryProductType = genericRepositoryProductType;
+            GenericRepositoryProductBrand = genericRepositoryProductBrand;
+            this.mapper = mapper;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
         {
-            return await _context.Products.ToListAsync();
+            var spec = new ProductsWithTypesAndBrandsSpecification();
+            var products = await GenericRepositoryProducts.ListAsync(spec);
+            return Ok(mapper.Map<IEnumerable<Product>,IEnumerable<ProductToReturnDto>>(products));
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Product>> GetProduct(int id)
+        public async Task<ActionResult<ProductToReturnDto>> GetProduct(int id)
         {
-            var product = await _context.Products.FindAsync(id);
-
+            var spec = new ProductsWithTypesAndBrandsSpecification(id);
+            var product = await GenericRepositoryProducts.GetEntityWithSpec(spec);
             if (product == null)
             {
                 return NotFound();
             }
-
-            return product;
+            return mapper.Map<Product,ProductToReturnDto>(product);
         }
 
         [HttpPut("{id}")]
@@ -42,12 +56,9 @@ namespace EcommerceSportsShopNetAndAngular.Controllers
             {
                 return BadRequest();
             }
-
-            _context.Entry(product).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
+                await GenericRepositoryProducts.Update(product);
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -60,37 +71,60 @@ namespace EcommerceSportsShopNetAndAngular.Controllers
                     throw;
                 }
             }
-
             return NoContent();
         }
 
         [HttpPost]
-        public async Task<ActionResult<Product>> PostProduct(Product product)
+        public void PostProduct(Product product)
         {
-            _context.Products.Add(product);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetProduct", new { id = product.Id }, product);
+            try
+            {
+                var newProduct = GenericRepositoryProducts.Add(product);
+                CreatedAtAction("GetProduct", new { id = newProduct.Id }, newProduct);
+            }
+            catch (Exception ex)
+            {
+                BadRequest(ex.Message);
+            }
         }
 
+
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteProduct(int id)
+        public async Task<ActionResult<Product>> DeleteProduct(Product product)
         {
-            var product = await _context.Products.FindAsync(id);
-            if (product == null)
+            var productres = await GenericRepositoryProducts.GetByIdAsync(product.Id);
+            if (productres == null)
             {
                 return NotFound();
             }
-
-            _context.Products.Remove(product);
-            await _context.SaveChangesAsync();
-
+            try
+            {
+                await GenericRepositoryProducts.Delete(productres);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
             return NoContent();
+        }
+
+        [HttpGet("brands")]
+        public async Task<ActionResult<IReadOnlyList<ProductBrand>>> GetProductBrands()
+        {
+            var brands = await GenericRepositoryProductBrand.ListAllAsync();
+            return Ok(brands);
+        }
+
+        [HttpGet("types")]
+        public async Task<ActionResult<IReadOnlyList<ProductType>>> GetProductTypes()
+        {
+            var types = await GenericRepositoryProductType.ListAllAsync();
+            return Ok(types);
         }
 
         private bool ProductExists(int id)
         {
-            return _context.Products.Any(e => e.Id == id);
+            return GenericRepositoryProducts.GetByIdAsync(id) != null;
         }
     }
 }
