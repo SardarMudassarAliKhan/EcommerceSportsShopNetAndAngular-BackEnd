@@ -1,7 +1,11 @@
 using Core.Interfaces;
+using EcommerceSportsShopNetAndAngular.Errors;
+using EcommerceSportsShopNetAndAngular.Extensions;
+using EcommerceSportsShopNetAndAngular.Middlewere;
 using Infrastracture.Data; // Make sure to import the namespace for AppDbContext
 using Infrastracture.Repositories;
 using Infrastructure.Data;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore; // Make sure to import the namespace for Entity Framework Core
 
 namespace EcommerceSportsShopNetAndAngular
@@ -18,15 +22,15 @@ namespace EcommerceSportsShopNetAndAngular
                 options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
 
             // Adding Services to the IOC container
-            builder.Services.AddScoped<IProductRepository, ProductRepository>();
-            builder.Services.AddScoped(typeof(IGenericRepository<>), (typeof(GenericRepository<>)));
-
             builder.Services.AddControllers();
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
-            builder.Services.AddAutoMapper(typeof(Program));
+            builder.Services.AddApplicationServices(builder.Configuration);
+            builder.Services.AddSwaggerDocumentation();
+
 
             var app = builder.Build();
+            app.UseMiddleware<ExceptionMiddleware>();
+
+            app.UseStatusCodePagesWithReExecute("/errors/{0}");
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())

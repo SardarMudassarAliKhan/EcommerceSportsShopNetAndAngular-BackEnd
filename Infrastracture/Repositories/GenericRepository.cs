@@ -1,6 +1,5 @@
 ﻿using Core.Entities;
 using Core.Interfaces;
-using Core.Specifications;
 using Infrastracture.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -56,7 +55,7 @@ namespace Infrastructure.Data
         }
 
         Task IGenericRepository<T>.Add(T entity)
-        { 
+        {
             _context.Set<T>().Add(entity);
             return _context.SaveChangesAsync();
         }
@@ -72,6 +71,6 @@ namespace Infrastructure.Data
             return SpecificationEvaluator<T>.GetQuery(_context.Set<T>().AsQueryable(), spec);
         }
 
-        
+
     }
 }

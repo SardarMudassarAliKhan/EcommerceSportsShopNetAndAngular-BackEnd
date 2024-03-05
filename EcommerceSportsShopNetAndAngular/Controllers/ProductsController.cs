@@ -3,6 +3,8 @@ using Core.Entities;
 using Core.Interfaces;
 using Core.Specifications;
 using EcommerceSportsShopNetAndAngular.Dtos.API.Dtos;
+using EcommerceSportsShopNetAndAngular.Errors;
+using EcommerceSportsShopNetAndAngular.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,7 +12,7 @@ namespace EcommerceSportsShopNetAndAngular.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ProductsController : ControllerBase
+    public class ProductsController : BaseApiController
     {
         public IGenericRepository<Product> GenericRepositoryProducts;
         public IGenericRepository<ProductType> GenericRepositoryProductType;
@@ -30,11 +32,24 @@ namespace EcommerceSportsShopNetAndAngular.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
+        public async Task<ActionResult<Pagination<ProductToReturnDto>>> GetProducts([FromQuery] ProductSpecParams productParams)
         {
-            var spec = new ProductsWithTypesAndBrandsSpecification();
+            var spec = new ProductsWithTypesAndBrandsSpecification(productParams);
+            var countSpec = new ProductsWithFiltersForCountSpecification(productParams);
+
+            var totalItems = await GenericRepositoryProducts.CountAsync(countSpec);
+
             var products = await GenericRepositoryProducts.ListAsync(spec);
-            return Ok(mapper.Map<IEnumerable<Product>,IEnumerable<ProductToReturnDto>>(products));
+
+            if (products == null)
+            {
+                return NotFound(new ApiResponse(404));
+            }
+
+            var data = mapper.Map<IReadOnlyList<ProductToReturnDto>>(products);
+
+            return Ok(new Pagination<ProductToReturnDto>(productParams.PageIndex, productParams.PageSize, totalItems, data));
+            
         }
 
         [HttpGet("{id}")]
@@ -44,34 +59,25 @@ namespace EcommerceSportsShopNetAndAngular.Controllers
             var product = await GenericRepositoryProducts.GetEntityWithSpec(spec);
             if (product == null)
             {
-                return NotFound();
+                return NotFound(new ApiResponse(404));
             }
             return mapper.Map<Product,ProductToReturnDto>(product);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutProduct(int id, Product product)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse),StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse),StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<ProductToReturnDto>> PutProduct(int id, Product product)
         {
-            if (id != product.Id)
-            {
-                return BadRequest();
-            }
-            try
-            {
-                await GenericRepositoryProducts.Update(product);
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ProductExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-            return NoContent();
+            var spec = new ProductsWithTypesAndBrandsSpecification(id);
+            var products = await GenericRepositoryProducts.GetEntityWithSpec(spec);
+
+            if (id != product.Id) return BadRequest(new ApiResponse(400));
+
+            if (products == null) return NotFound(new ApiResponse(404));
+
+            return mapper.Map<Product, ProductToReturnDto>(product);
         }
 
         [HttpPost]
@@ -111,15 +117,13 @@ namespace EcommerceSportsShopNetAndAngular.Controllers
         [HttpGet("brands")]
         public async Task<ActionResult<IReadOnlyList<ProductBrand>>> GetProductBrands()
         {
-            var brands = await GenericRepositoryProductBrand.ListAllAsync();
-            return Ok(brands);
+            return Ok(await GenericRepositoryProductBrand.ListAllAsync());
         }
 
         [HttpGet("types")]
         public async Task<ActionResult<IReadOnlyList<ProductType>>> GetProductTypes()
         {
-            var types = await GenericRepositoryProductType.ListAllAsync();
-            return Ok(types);
+            return Ok(await GenericRepositoryProductType.ListAllAsync());
         }
 
         private bool ProductExists(int id)
