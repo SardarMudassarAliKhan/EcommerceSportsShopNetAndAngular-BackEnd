@@ -42,6 +42,7 @@ namespace EcommerceSportsShopNetAndAngular
                 });
             }
 
+            app.UseCors("CorsPolicy");
             app.UseStaticFiles();
 
             app.UseHttpsRedirection();
