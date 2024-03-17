@@ -1,6 +1,6 @@
 ﻿using Core.Entities;
+using Core.Entities.Identity;
 using Microsoft.EntityFrameworkCore;
-using System.Reflection;
 
 namespace Infrastracture.Data
 {
@@ -16,6 +16,8 @@ namespace Infrastracture.Data
         public DbSet<ProductBrand> ProductBrands { get; set; }
 
         public DbSet<ProductType> ProductTypes { get; set; }
+
+        public DbSet<AppUser> AppUsers { get; set; }
 
     }
 }
