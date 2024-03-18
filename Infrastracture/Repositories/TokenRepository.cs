@@ -6,6 +6,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 
+
 namespace Infrastracture.Repositories
 {
     public class TokenRepository : ITokenRepository
@@ -19,6 +20,12 @@ namespace Infrastracture.Repositories
 
         public string GenerateAccessToken(AppUser appUser)
         {
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Email,appUser.Email),
+                new Claim(ClaimTypes.GivenName, appUser.DisplayName)
+            };
+
             var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(JsonWebTokenKeys.securityKey));
             var signinCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
             var tokeOptions = new JwtSecurityToken(
@@ -28,7 +35,21 @@ namespace Infrastracture.Repositories
                 signingCredentials: signinCredentials
             );
             var tokenString = new JwtSecurityTokenHandler().WriteToken(tokeOptions);
-            return tokenString;
+            var creds = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
+
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(claims),
+                Expires = DateTime.Now.AddDays(7),
+                SigningCredentials = creds,
+                Issuer = JsonWebTokenKeys.ValidIssuer
+            };
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+
+            return tokenHandler.WriteToken(token);
         }
 
         public string GenerateRefreshToken()
