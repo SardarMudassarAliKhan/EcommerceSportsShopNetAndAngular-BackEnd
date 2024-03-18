@@ -14,7 +14,6 @@ namespace API.Controllers
     public class AccountController : BaseApiController
     {
         private readonly UserManager<AppUser> UserManager;
-        private readonly RoleManager<IdentityRole> RoleManager;
         private readonly SignInManager<AppUser> SignInManager;
         private readonly ITokenService TokenService;
         private readonly IMapper Mapper;
