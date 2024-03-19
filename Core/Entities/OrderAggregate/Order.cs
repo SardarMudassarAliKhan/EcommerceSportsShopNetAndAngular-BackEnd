@@ -5,8 +5,8 @@
         public Order()
         {
         }
-        public Order(IReadOnlyList<OrderItem> orderItems, string buyerEmail, Address shipToAddress,
-            DeliveryMethod deliveryMethod, decimal subtotal, string paymentIntentId)
+        public Order(IReadOnlyList<OrderItem> orderItems, string buyerEmail, OrderAddress shipToAddress,
+            OrderDeliveryMethod deliveryMethod, decimal subtotal, string paymentIntentId)
         {
             BuyerEmail = buyerEmail;
             ShipToAddress = shipToAddress;
@@ -18,8 +18,8 @@
 
         public string BuyerEmail { get; set; }
         public DateTime OrderDate { get; set; } = DateTime.UtcNow;
-        public Address ShipToAddress { get; set; }
-        public DeliveryMethod DeliveryMethod { get; set; }
+        public OrderAddress ShipToAddress { get; set; }
+        public OrderDeliveryMethod DeliveryMethod { get; set; }
         public IReadOnlyList<OrderItem> OrderItems { get; set; }
         public decimal Subtotal { get; set; }
         public OrderStatus Status { get; set; } = OrderStatus.Pending;

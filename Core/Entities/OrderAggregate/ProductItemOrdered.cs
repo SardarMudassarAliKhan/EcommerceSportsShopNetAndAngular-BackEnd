@@ -12,7 +12,7 @@
             ProductName = productName;
             PictureUrl = pictureUrl;
         }
-
+        public int Id { get; set; }
         public int ProductItemId { get; set; }
         public string ProductName { get; set; }
         public string PictureUrl { get; set; }
