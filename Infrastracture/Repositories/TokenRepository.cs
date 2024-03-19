@@ -27,14 +27,7 @@ namespace Infrastracture.Repositories
             };
 
             var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(JsonWebTokenKeys.securityKey));
-            var signinCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
-            var tokeOptions = new JwtSecurityToken(
-                issuer: JsonWebTokenKeys.ValidIssuer,
-                audience: JsonWebTokenKeys.ValidAudience,
-                expires: DateTime.Now.AddMinutes(5),
-                signingCredentials: signinCredentials
-            );
-            var tokenString = new JwtSecurityTokenHandler().WriteToken(tokeOptions);
+            
             var creds = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
 
             var tokenDescriptor = new SecurityTokenDescriptor
