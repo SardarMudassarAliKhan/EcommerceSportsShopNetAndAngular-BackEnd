@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.Data.Config
 {
-    public class DeliveryMethodConfiguration : IEntityTypeConfiguration<DeliveryMethod>
+    public class DeliveryMethodConfiguration : IEntityTypeConfiguration<OrderDeliveryMethod>
     {
-        public void Configure(EntityTypeBuilder<DeliveryMethod> builder)
+        public void Configure(EntityTypeBuilder<OrderDeliveryMethod> builder)
         {
             builder.Property(d => d.Price)
                 .HasColumnType("decimal(18,2)");

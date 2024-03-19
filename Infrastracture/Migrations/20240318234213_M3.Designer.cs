@@ -4,6 +4,7 @@ using Infrastracture.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastracture.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240318234213_M3")]
+    partial class M3
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -122,164 +125,6 @@ namespace Infrastracture.Migrations
                     b.ToTable("AppUsers");
                 });
 
-            modelBuilder.Entity("Core.Entities.OrderAggregate.Order", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("BuyerEmail")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("DeliveryMethodId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("OrderDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("PaymentIntentId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("ShipToAddressId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Subtotal")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DeliveryMethodId");
-
-                    b.HasIndex("ShipToAddressId");
-
-                    b.ToTable("Orders");
-                });
-
-            modelBuilder.Entity("Core.Entities.OrderAggregate.OrderAddress", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("City")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FirstName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("State")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Street")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ZipCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("OrderAddress");
-                });
-
-            modelBuilder.Entity("Core.Entities.OrderAggregate.OrderDeliveryMethod", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("DeliveryTime")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("ShortName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("DeliveryMethods");
-                });
-
-            modelBuilder.Entity("Core.Entities.OrderAggregate.OrderItem", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("ItemOrderedId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("OrderId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ItemOrderedId");
-
-                    b.HasIndex("OrderId");
-
-                    b.ToTable("OrderItems");
-                });
-
-            modelBuilder.Entity("Core.Entities.OrderAggregate.ProductItemOrdered", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("PictureUrl")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("ProductItemId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ProductName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ProductItemOrdered");
-                });
-
             modelBuilder.Entity("Core.Entities.Product", b =>
                 {
                     b.Property<int>("Id")
@@ -360,40 +205,6 @@ namespace Infrastracture.Migrations
                     b.Navigation("AppUser");
                 });
 
-            modelBuilder.Entity("Core.Entities.OrderAggregate.Order", b =>
-                {
-                    b.HasOne("Core.Entities.OrderAggregate.OrderDeliveryMethod", "DeliveryMethod")
-                        .WithMany()
-                        .HasForeignKey("DeliveryMethodId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Core.Entities.OrderAggregate.OrderAddress", "ShipToAddress")
-                        .WithMany()
-                        .HasForeignKey("ShipToAddressId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("DeliveryMethod");
-
-                    b.Navigation("ShipToAddress");
-                });
-
-            modelBuilder.Entity("Core.Entities.OrderAggregate.OrderItem", b =>
-                {
-                    b.HasOne("Core.Entities.OrderAggregate.ProductItemOrdered", "ItemOrdered")
-                        .WithMany()
-                        .HasForeignKey("ItemOrderedId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Core.Entities.OrderAggregate.Order", null)
-                        .WithMany("OrderItems")
-                        .HasForeignKey("OrderId");
-
-                    b.Navigation("ItemOrdered");
-                });
-
             modelBuilder.Entity("Core.Entities.Product", b =>
                 {
                     b.HasOne("Core.Entities.ProductBrand", "ProductBrand")
@@ -417,11 +228,6 @@ namespace Infrastracture.Migrations
                 {
                     b.Navigation("Address")
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("Core.Entities.OrderAggregate.Order", b =>
-                {
-                    b.Navigation("OrderItems");
                 });
 #pragma warning restore 612, 618
         }
