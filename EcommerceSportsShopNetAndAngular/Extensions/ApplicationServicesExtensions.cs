@@ -6,6 +6,7 @@ using Infrastracture.Repositories;
 using Infrastructure.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Services.Services;
 using SMAK_AJWTAuthNetCore_Services.Services;
 using StackExchange.Redis;
 
@@ -30,6 +31,8 @@ namespace EcommerceSportsShopNetAndAngular.Extensions
             services.AddScoped<JsonWebTokenKeys>();
             services.AddScoped<ITokenRepository, TokenRepository>();
             services.AddScoped<ITokenService, TokenService>();
+            services.AddScoped<IOrderService, OrderService>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped(typeof(IGenericRepository<>), (typeof(GenericRepository<>)));
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             services.Configure<ApiBehaviorOptions>(options =>

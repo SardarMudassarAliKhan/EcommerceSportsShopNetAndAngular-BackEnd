@@ -35,7 +35,7 @@ namespace API.Extensions
                     ValidateIssuer = bool.Parse(config["JsonWebTokenKeys:ValidateIssuer"]),
                     ValidAudience = config["JsonWebTokenKeys:ValidAudience"],
                     ValidIssuer = config["JsonWebTokenKeys:ValidIssuer"],
-                    ValidateAudience = bool.Parse(config["JsonWebTokenKeys:ValidateAudience"]),
+                    ValidateAudience = false,
                     RequireExpirationTime = bool.Parse(config["JsonWebTokenKeys:RequireExpirationTime"]),
                     ValidateLifetime = bool.Parse(config["JsonWebTokenKeys:ValidateLifetime"])
                 };

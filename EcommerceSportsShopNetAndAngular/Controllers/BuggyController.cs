@@ -1,4 +1,5 @@
 ﻿using EcommerceSportsShopNetAndAngular.Errors;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,6 +9,12 @@ namespace EcommerceSportsShopNetAndAngular.Controllers
     [ApiController]
     public class BuggyController : BaseApiController
     {
+        [HttpGet("testauth")]
+        [Authorize]
+        public ActionResult<string> GetSecretText()
+        {
+            return "secret stuff";
+        }
         [HttpGet("notfound")]
         public ActionResult GetNotFoundRequest()
         {
