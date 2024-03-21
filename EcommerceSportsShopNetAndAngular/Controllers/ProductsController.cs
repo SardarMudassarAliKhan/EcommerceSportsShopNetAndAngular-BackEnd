@@ -1,134 +1,77 @@
-﻿using AutoMapper;
+﻿using API.Helpers;
+using AutoMapper;
 using Core.Entities;
 using Core.Interfaces;
 using Core.Specifications;
+using EcommerceSportsShopNetAndAngular.Controllers;
 using EcommerceSportsShopNetAndAngular.Dtos.API.Dtos;
 using EcommerceSportsShopNetAndAngular.Errors;
 using EcommerceSportsShopNetAndAngular.Helpers;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace EcommerceSportsShopNetAndAngular.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
     public class ProductsController : BaseApiController
     {
-        public IGenericRepository<Product> GenericRepositoryProducts;
-        public IGenericRepository<ProductType> GenericRepositoryProductType;
-        public IGenericRepository<ProductBrand> GenericRepositoryProductBrand;
-        private readonly IMapper mapper;
+        private readonly IGenericRepository<ProductBrand> _productBrandRepo;
+        private readonly IGenericRepository<ProductType> _productTypeRepo;
+        private readonly IGenericRepository<Product> _productsRepo;
+        private readonly IMapper _mapper;
 
-        public ProductsController(
-            IGenericRepository<Product> genericRepositoryProducs,
-            IGenericRepository<ProductType> genericRepositoryProductType,
-            IGenericRepository<ProductBrand> genericRepositoryProductBrand,
-            IMapper mapper)
+        public ProductsController(IGenericRepository<Product> productsRepo,
+            IGenericRepository<ProductType> productTypeRepo,
+            IGenericRepository<ProductBrand> productBrandRepo, IMapper mapper)
         {
-            GenericRepositoryProducts = genericRepositoryProducs;
-            GenericRepositoryProductType = genericRepositoryProductType;
-            GenericRepositoryProductBrand = genericRepositoryProductBrand;
-            this.mapper = mapper;
+            _mapper = mapper;
+            _productsRepo = productsRepo;
+            _productTypeRepo = productTypeRepo;
+            _productBrandRepo = productBrandRepo;
         }
 
+        [Cached(600)]
         [HttpGet]
-        public async Task<ActionResult<Pagination<ProductToReturnDto>>> GetProducts([FromQuery] ProductSpecParams productParams)
+        public async Task<ActionResult<Pagination<ProductToReturnDto>>> GetProducts(
+            [FromQuery] ProductSpecParams productParams)
         {
             var spec = new ProductsWithTypesAndBrandsSpecification(productParams);
             var countSpec = new ProductsWithFiltersForCountSpecification(productParams);
 
-            var totalItems = await GenericRepositoryProducts.CountAsync(countSpec);
+            var totalItems = await _productsRepo.CountAsync(countSpec);
+            var products = await _productsRepo.ListAsync(spec);
 
-            var products = await GenericRepositoryProducts.ListAsync(spec);
+            var data = _mapper.Map<IReadOnlyList<ProductToReturnDto>>(products);
 
-            if (products == null)
-            {
-                return NotFound(new ApiResponse(404));
-            }
-
-            var data = mapper.Map<IReadOnlyList<ProductToReturnDto>>(products);
-
-            return Ok(new Pagination<ProductToReturnDto>(productParams.PageIndex, productParams.PageSize, totalItems, data));
-            
+            return Ok(new Pagination<ProductToReturnDto>(productParams.PageIndex,
+                productParams.PageSize, totalItems, data));
         }
 
+        [Cached(600)]
         [HttpGet("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<ProductToReturnDto>> GetProduct(int id)
         {
             var spec = new ProductsWithTypesAndBrandsSpecification(id);
-            var product = await GenericRepositoryProducts.GetEntityWithSpec(spec);
-            if (product == null)
-            {
-                return NotFound(new ApiResponse(404));
-            }
-            return mapper.Map<Product,ProductToReturnDto>(product);
+
+            var product = await _productsRepo.GetEntityWithSpec(spec);
+
+            if (product == null) return NotFound(new ApiResponse(404));
+
+            return _mapper.Map<Product, ProductToReturnDto>(product);
         }
 
-        [HttpPut("{id}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ApiResponse),StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ApiResponse),StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<ProductToReturnDto>> PutProduct(int id, Product product)
-        {
-            var spec = new ProductsWithTypesAndBrandsSpecification(id);
-            var products = await GenericRepositoryProducts.GetEntityWithSpec(spec);
-
-            if (id != product.Id) return BadRequest(new ApiResponse(400));
-
-            if (products == null) return NotFound(new ApiResponse(404));
-
-            return mapper.Map<Product, ProductToReturnDto>(product);
-        }
-
-        [HttpPost]
-        public void PostProduct(Product product)
-        {
-            try
-            {
-                var newProduct = GenericRepositoryProducts.Add(product);
-                CreatedAtAction("GetProduct", new { id = newProduct.Id }, newProduct);
-            }
-            catch (Exception ex)
-            {
-                BadRequest(ex.Message);
-            }
-        }
-
-
-        [HttpDelete("{id}")]
-        public async Task<ActionResult<Product>> DeleteProduct(Product product)
-        {
-            var productres = await GenericRepositoryProducts.GetByIdAsync(product.Id);
-            if (productres == null)
-            {
-                return NotFound();
-            }
-            try
-            {
-                await GenericRepositoryProducts.Delete(productres);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            return NoContent();
-        }
-
+        [Cached(600)]
         [HttpGet("brands")]
         public async Task<ActionResult<IReadOnlyList<ProductBrand>>> GetProductBrands()
         {
-            return Ok(await GenericRepositoryProductBrand.ListAllAsync());
+            return Ok(await _productBrandRepo.ListAllAsync());
         }
 
+        [Cached(600)]
         [HttpGet("types")]
-        public async Task<ActionResult<IReadOnlyList<ProductType>>> GetProductTypes()
+        public async Task<ActionResult<IReadOnlyList<ProductBrand>>> GetProductTypes()
         {
-            return Ok(await GenericRepositoryProductType.ListAllAsync());
-        }
-
-        private bool ProductExists(int id)
-        {
-            return GenericRepositoryProducts.GetByIdAsync(id) != null;
+            return Ok(await _productTypeRepo.ListAllAsync());
         }
     }
 }

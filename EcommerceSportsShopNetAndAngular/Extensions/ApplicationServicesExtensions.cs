@@ -34,6 +34,7 @@ namespace EcommerceSportsShopNetAndAngular.Extensions
             services.AddScoped<IOrderService, OrderService>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped(typeof(IGenericRepository<>), (typeof(GenericRepository<>)));
+            services.AddScoped<IResponseCacheService, ResponseCacheService>();
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             services.Configure<ApiBehaviorOptions>(options =>
             {
@@ -57,7 +58,7 @@ namespace EcommerceSportsShopNetAndAngular.Extensions
             {
                 opt.AddPolicy("CorsPolicy", policy =>
                 {
-                    policy.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:4200");
+                    policy.AllowAnyHeader().AllowAnyMethod().WithOrigins("https://localhost:4200");
                 });
             });
 
